@@ -47,6 +47,11 @@ struct function functions[] = {
 // Your thread data structures go here
 
 struct thread_data{
+    int begin;
+    int end;
+    long double result;
+    long double (*f)(long double);
+    long double *samples;
 };
 
 struct thread_data *thread_data_array;
@@ -88,14 +93,25 @@ void print_array(long double *sample, int size){
 }
 
 long double monte_carlo_integrate(long double (*f)(long double), long double *samples, int size){
-    // Your sequential code goes here
-    printf("Not implemented yet\n");
-    exit(-1);
-    return 0.0L;
+    // Your sequencial code goes here
+    long double accumulator = 0;
+    for (int i = 0; i<size; i++) {
+        accumulator += f(samples[i]);
+    }
+    return accumulator / size;
 }
 
 void *monte_carlo_integrate_thread(void *args){
     // Your pthreads code goes here
+
+    struct thread_data *arg_struct = (struct thread_data*) args; 
+
+    long double accumulator = 0;
+    for (int i = arg_struct->begin; i < arg_struct->end; i++) {
+        accumulator += arg_struct->f((arg_struct->samples)[i]);
+    }
+
+    arg_struct->result = accumulator;
     pthread_exit(NULL);
 }
 
@@ -159,9 +175,45 @@ int main(int argc, char **argv){
         gettimeofday(&timer.v_start, NULL);
 
         // Your pthreads code goes here
+        
+        pthread_t tids[n_threads];
+        thread_data_array = malloc(n_threads * sizeof(struct thread_data));
+        long double *sample = uniform_sample(target_function.interval,
+                                             samples,
+                                             size);
 
-        printf("Not implemented yet\n");
-        exit(-1);
+        for (int i = 0; i < n_threads; i++) {
+            pthread_attr_t attr;
+		    pthread_attr_init(&attr);
+
+            if (i == 0) {
+                thread_data_array[i].begin = 0;
+            } else {
+                thread_data_array[i].begin = thread_data_array[i-1].end;
+            }
+
+            int gap = size / n_threads; 
+            if (i == n_threads - 1) {
+                thread_data_array[i].end = size;
+            } else {
+                thread_data_array[i].end = thread_data_array[i].begin + gap;
+            }
+
+            thread_data_array[i].f = target_function.f;
+            thread_data_array[i].samples = sample;
+
+            pthread_create(&tids[i], &attr, 
+                           monte_carlo_integrate_thread, &thread_data_array[i]);
+        }
+
+        estimate = 0;
+        for (int i = 0; i < n_threads; i++) {
+            pthread_join(tids[i], NULL);
+            long double result = thread_data_array[i].result;
+            int gap = thread_data_array[i].end - thread_data_array[i].begin;
+            estimate += result / gap;
+        }
+        estimate /= n_threads;
 
         // Your pthreads code ends here
 
