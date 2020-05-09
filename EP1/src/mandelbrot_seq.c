@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
+#include <sys/time.h>
 
 double c_x_min;
 double c_x_max;
@@ -162,7 +164,12 @@ int main(int argc, char *argv[]){
 
     allocate_image_buffer();
 
+    clock_t start = clock();
     compute_mandelbrot();
+    clock_t end = clock();
+
+    clock_t time = (end - start) / CLOCKS_PER_SEC;
+    printf("Time: %ld s\n", time);
 
     write_to_file();
 

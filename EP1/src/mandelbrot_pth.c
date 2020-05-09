@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <pthread.h>
+#include <time.h>
+#include <sys/time.h>
 
 double c_x_min;
 double c_x_max;
@@ -39,7 +42,18 @@ int colors[17][3] = {
                         {106, 52, 3},
                         {16, 16, 16},
                     };
+//////////////////////////////////////////
 
+struct thread_data {
+    int begin;
+    int end;
+    void (*f)(int, int, int);
+
+};
+
+struct thread_data *thread_data_array;
+
+/////////////////////////////////////////
 void allocate_image_buffer(){
     int rgb_size = 3;
     image_buffer = (unsigned char **) malloc(sizeof(unsigned char *) * image_buffer_size);
@@ -94,7 +108,7 @@ void update_rgb_buffer(int iteration, int x, int y){
 
 void write_to_file(){
     FILE * file;
-    char * filename               = "output.ppm";
+    char * filename               = "output_pth.ppm";
     char * comment                = "# ";
 
     int max_color_component_value = 255;
@@ -111,7 +125,10 @@ void write_to_file(){
     fclose(file);
 };
 
-void compute_mandelbrot(){
+void *compute_mandelbrot_thread(void *args){
+
+    struct thread_data *arg_struct = (struct thread_data*) args; 
+
     double z_x;
     double z_y;
     double z_x_squared;
@@ -125,7 +142,7 @@ void compute_mandelbrot(){
     double c_x;
     double c_y;
 
-    for(i_y = 0; i_y < i_y_max; i_y++){
+    for(i_y = arg_struct->begin; i_y < arg_struct->end; i_y++){
         c_y = c_y_min + i_y * pixel_height;
 
         if(fabs(c_y) < pixel_height / 2){
@@ -152,9 +169,10 @@ void compute_mandelbrot(){
                 z_y_squared = z_y * z_y;
             };
 
-            update_rgb_buffer(iteration, i_x, i_y);
+            arg_struct->f(iteration, i_x, i_y);
         };
     };
+    pthread_exit(NULL);
 };
 
 int main(int argc, char *argv[]){
@@ -162,7 +180,46 @@ int main(int argc, char *argv[]){
 
     allocate_image_buffer();
 
-    compute_mandelbrot();
+    ///////////////////////////////////////////
+    clock_t start = clock();
+
+    int n_threads = 4;
+
+    pthread_t tids[n_threads];
+    thread_data_array = malloc(n_threads * sizeof(struct thread_data));
+
+    for (int i = 0; i < n_threads; i++) {
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+
+        if (i == 0) {
+            thread_data_array[i].begin = 0;
+        } else {
+            thread_data_array[i].begin = thread_data_array[i-1].end;
+        }
+
+        int gap = i_y_max / n_threads; 
+        if (i == n_threads - 1) {
+            thread_data_array[i].end = i_y_max;
+        } else {
+            thread_data_array[i].end = thread_data_array[i].begin + gap;
+        }
+
+        thread_data_array[i].f = update_rgb_buffer;
+
+        pthread_create(&tids[i], &attr, 
+                           compute_mandelbrot_thread, &thread_data_array[i]);
+    }
+
+    for (int i = 0; i < n_threads; i++) {
+        pthread_join(tids[i], NULL);
+    }
+
+    clock_t end = clock();
+
+    clock_t time = (end - start) / CLOCKS_PER_SEC;
+    printf("Time: %ld s\n", time);
+    /////////////////////////////////////////
 
     write_to_file();
 

@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <omp.h>
+#include <time.h>
+#include <sys/time.h>
 
 double c_x_min;
 double c_x_max;
@@ -126,7 +128,7 @@ void compute_mandelbrot(){
     double c_x;
     double c_y;
 
-    #pragma omp parallel for default(shared) private(iteration, i_x, z_x, z_y, z_x_squared, z_y_squared, c_x) schedule(dynamic) num_threads(4)
+    #pragma omp parallel for default(shared) private(iteration, i_x, z_x, z_y, z_x_squared, z_y_squared, c_x, c_y) schedule(dynamic) num_threads(4)
     for(i_y = 0; i_y < i_y_max; i_y++){
         c_y = c_y_min + i_y * pixel_height;
 
@@ -164,7 +166,12 @@ int main(int argc, char *argv[]){
 
     allocate_image_buffer();
 
+    clock_t start = clock();
     compute_mandelbrot();
+    clock_t end = clock();
+
+    clock_t time = (end - start) / CLOCKS_PER_SEC;
+    printf("Time: %ld s\n", time);
 
     write_to_file();
 
