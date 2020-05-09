@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <omp.h>
 
 double c_x_min;
 double c_x_max;
@@ -94,7 +95,7 @@ void update_rgb_buffer(int iteration, int x, int y){
 
 void write_to_file(){
     FILE * file;
-    char * filename               = "output.ppm";
+    char * filename               = "output_omp.ppm";
     char * comment                = "# ";
 
     int max_color_component_value = 255;
@@ -125,6 +126,7 @@ void compute_mandelbrot(){
     double c_x;
     double c_y;
 
+    #pragma omp parallel for default(shared) private(iteration, i_x, z_x, z_y, z_x_squared, z_y_squared, c_x) schedule(dynamic) num_threads(4)
     for(i_y = 0; i_y < i_y_max; i_y++){
         c_y = c_y_min + i_y * pixel_height;
 
