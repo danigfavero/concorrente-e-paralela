@@ -217,8 +217,8 @@ int main(int argc, char *argv[]){
 
     clock_t end = clock();
 
-    clock_t time = (end - start) / CLOCKS_PER_SEC;
-    printf("Time: %ld s\n", time);
+    long double time = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("%Lf\n", time);
     /////////////////////////////////////////
 
     write_to_file();
