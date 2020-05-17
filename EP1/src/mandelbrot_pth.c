@@ -183,11 +183,11 @@ int main(int argc, char *argv[]){
     allocate_image_buffer();
 
     ///////////////////////////////////////////
-    clock_t start = clock();
 
     pthread_t tids[n_threads];
     thread_data_array = malloc(n_threads * sizeof(struct thread_data));
 
+    clock_t start = clock();
     for (int i = 0; i < n_threads; i++) {
         pthread_attr_t attr;
         pthread_attr_init(&attr);
