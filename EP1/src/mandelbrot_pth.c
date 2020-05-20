@@ -44,6 +44,17 @@ int colors[17][3] = {
                         {16, 16, 16},
                     };
 //////////////////////////////////////////
+struct timer_info {
+    clock_t c_start;
+    clock_t c_end;
+    struct timespec t_start;
+    struct timespec t_end;
+    struct timeval v_start;
+    struct timeval v_end;
+};
+
+struct timer_info timer;
+
 
 struct thread_data {
     int begin;
@@ -52,19 +63,7 @@ struct thread_data {
 
 };
 
-struct package {
-    int i_x;
-    int i_y;
-    double z_x;
-    double z_y;
-    double c_x;
-    double c_y;
-    double z_x_squared;
-    double z_y_squared;
-};
-
 struct thread_data *thread_data_array;
-struct package *linearized_matrix;
 
 /////////////////////////////////////////
 void allocate_image_buffer(){
@@ -150,19 +149,29 @@ void *compute_mandelbrot_thread(void *args){
     double escape_radius_squared = 4;
 
     int iteration;
+    int i_x;
+    int i_y;
 
     double c_x;
     double c_y;
-    for(int i = arg_struct->begin; i < arg_struct->end; i++){
-        
-        c_x = linearized_matrix[i].c_x;
-        c_y = linearized_matrix[i].c_y;
-        z_x = linearized_matrix[i].z_x;
-        z_y = linearized_matrix[i].z_y;
-        z_x_squared = linearized_matrix[i].z_x_squared;
-        z_y_squared = linearized_matrix[i].z_y_squared;
-        
-        for(iteration = 0;
+
+    for(i_y = arg_struct->begin; i_y < arg_struct->end; i_y++){
+        c_y = c_y_min + i_y * pixel_height;
+
+        if(fabs(c_y) < pixel_height / 2){
+            c_y = 0.0;
+        };
+
+        for(i_x = 0; i_x < i_x_max; i_x++){
+            c_x         = c_x_min + i_x * pixel_width;
+
+            z_x         = 0.0;
+            z_y         = 0.0;
+
+            z_x_squared = 0.0;
+            z_y_squared = 0.0;
+
+            for(iteration = 0;
                 iteration < iteration_max && \
                 ((z_x_squared + z_y_squared) < escape_radius_squared);
                 iteration++){
@@ -173,11 +182,10 @@ void *compute_mandelbrot_thread(void *args){
                 z_y_squared = z_y * z_y;
             };
 
-            arg_struct->f(iteration, linearized_matrix[i].i_x, linearized_matrix[i].i_y);
-    }
-
+            arg_struct->f(iteration, i_x, i_y);
+        };
+    };
     pthread_exit(NULL);
-     
 };
 
 int main(int argc, char *argv[]){
@@ -185,30 +193,12 @@ int main(int argc, char *argv[]){
 
     allocate_image_buffer();
 
-    linearized_matrix = malloc(i_x_max * i_y_max * sizeof(struct package));
-    int counter = 0;
-    for(int i_y = 0; i_y < i_y_max; i_y++){
-        for(int i_x = 0; i_x < i_x_max; i_x++){
-
-            linearized_matrix[counter].i_x =                          i_x;
-            linearized_matrix[counter].i_y =                          i_y;
-            linearized_matrix[counter].c_x =  c_x_min + i_x * pixel_width;
-            linearized_matrix[counter].c_y = c_y_min + i_y * pixel_height;
-            if(fabs(linearized_matrix[counter].c_y < pixel_height / 2)){
-                linearized_matrix[counter].c_y = 0.0;
-            }    
-            linearized_matrix[counter].z_x =                          0.0;
-            linearized_matrix[counter].z_y =                          0.0;
-            linearized_matrix[counter].z_x_squared =                  0.0;
-            linearized_matrix[counter].z_y_squared =                  0.0;
-            counter++;
-        };
-    };
+    ///////////////////////////////////////////
 
     pthread_t tids[n_threads];
     thread_data_array = malloc(n_threads * sizeof(struct thread_data));
 
-    clock_t start = clock();
+    clock_gettime(CLOCK_MONOTONIC, &timer.t_start);
     for (int i = 0; i < n_threads; i++) {
         pthread_attr_t attr;
         pthread_attr_init(&attr);
@@ -219,9 +209,9 @@ int main(int argc, char *argv[]){
             thread_data_array[i].begin = thread_data_array[i-1].end;
         }
 
-        int gap = (i_x_max*i_y_max) / n_threads; 
+        int gap = i_y_max / n_threads; 
         if (i == n_threads - 1) {
-            thread_data_array[i].end = i_x_max*i_y_max - 1;
+            thread_data_array[i].end = i_y_max;
         } else {
             thread_data_array[i].end = thread_data_array[i].begin + gap;
         }
@@ -230,17 +220,17 @@ int main(int argc, char *argv[]){
 
         pthread_create(&tids[i], &attr, 
                            compute_mandelbrot_thread, &thread_data_array[i]);
-    };
+    }
 
-    
     for (int i = 0; i < n_threads; i++) {
         pthread_join(tids[i], NULL);
     }
 
-    clock_t end = clock();
+    clock_gettime(CLOCK_MONOTONIC, &timer.t_end);
 
-    long double time = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("%Lf\n", time);
+    printf("%f\n",
+               (double) (timer.t_end.tv_sec - timer.t_start.tv_sec) +
+               (double) (timer.t_end.tv_nsec - timer.t_start.tv_nsec) / 1000000000.0);
     /////////////////////////////////////////
 
     write_to_file();

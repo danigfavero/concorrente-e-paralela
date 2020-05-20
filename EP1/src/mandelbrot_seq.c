@@ -42,6 +42,17 @@ int colors[17][3] = {
                         {16, 16, 16},
                     };
 
+struct timer_info {
+    clock_t c_start;
+    clock_t c_end;
+    struct timespec t_start;
+    struct timespec t_end;
+    struct timeval v_start;
+    struct timeval v_end;
+};
+
+struct timer_info timer;
+
 void allocate_image_buffer(){
     int rgb_size = 3;
     image_buffer = (unsigned char **) malloc(sizeof(unsigned char *) * image_buffer_size);
@@ -164,12 +175,14 @@ int main(int argc, char *argv[]){
 
     allocate_image_buffer();
 
-    clock_t start = clock();
+    clock_gettime(CLOCK_MONOTONIC, &timer.t_start);
     compute_mandelbrot();
-    clock_t end = clock();
+    clock_gettime(CLOCK_MONOTONIC, &timer.t_end);
 
-    long double time = (double) (end - start) / CLOCKS_PER_SEC;
-    printf("%Lf\n", time);
+    printf("%f\n",
+               (double) (timer.t_end.tv_sec - timer.t_start.tv_sec) +
+               (double) (timer.t_end.tv_nsec - timer.t_start.tv_nsec) / 1000000000.0);
+
 
     write_to_file();
 
