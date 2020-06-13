@@ -4,10 +4,6 @@
 #include <pthread.h>
 #include <time.h>
 #include <sys/time.h>
-#include "mpi.h"
-#include <stdio.h>
-#include <stdlib.h>
-#define  MASTER		0
 
 double c_x_min;
 double c_x_max;
@@ -18,6 +14,7 @@ double pixel_width;
 double pixel_height;
 
 int iteration_max = 200;
+int n_threads;
 
 int image_size;
 unsigned char **image_buffer;
@@ -67,26 +64,25 @@ struct thread_data {
 };
 
 struct thread_data *thread_data_array;
-unsigned char * buffer; 
+
 /////////////////////////////////////////
 void allocate_image_buffer(){
     int rgb_size = 3;
     image_buffer = (unsigned char **) malloc(sizeof(unsigned char *) * image_buffer_size);
-    buffer = (unsigned char *) malloc(i_x_max*i_y_max*(sizeof(unsigned char *)));
+
     for(int i = 0; i < image_buffer_size; i++){
         image_buffer[i] = (unsigned char *) malloc(sizeof(unsigned char) * rgb_size);
     };
 };
 
-
 void init(int argc, char *argv[]){
     if(argc < 7){
-        printf("usage: ./mandelbrot_openmpi c_x_min c_x_max c_y_min c_y_max image_size\n");
+        printf("usage: ./mandelbrot_pth c_x_min c_x_max c_y_min c_y_max image_size n_threads\n");
         printf("examples with image_size = 11500:\n");
-        printf("    Full Picture:         ./mandelbrot_openmpi -2.5 1.5 -2.0 2.0 11500\n");
-        printf("    Seahorse Valley:      ./mandelbrot_openmpi -0.8 -0.7 0.05 0.15 11500\n");
-        printf("    Elephant Valley:      ./mandelbrot_openmpi 0.175 0.375 -0.1 0.1 11500\n");
-        printf("    Triple Spiral Valley: ./mandelbrot_openmpi -0.188 -0.012 0.554 0.754 11500\n");
+        printf("    Full Picture:         ./mandelbrot_pth -2.5 1.5 -2.0 2.0 11500 4\n");
+        printf("    Seahorse Valley:      ./mandelbrot_pth -0.8 -0.7 0.05 0.15 11500 4\n");
+        printf("    Elephant Valley:      ./mandelbrot_pth 0.175 0.375 -0.1 0.1 11500 4\n");
+        printf("    Triple Spiral Valley: ./mandelbrot_pth -0.188 -0.012 0.554 0.754 11500 4\n");
         exit(0);
     }
     else{
@@ -95,6 +91,7 @@ void init(int argc, char *argv[]){
         sscanf(argv[3], "%lf", &c_y_min);
         sscanf(argv[4], "%lf", &c_y_max);
         sscanf(argv[5], "%d", &image_size);
+        sscanf(argv[6], "%d", &n_threads);
 
         i_x_max           = image_size;
         i_y_max           = image_size;
@@ -124,7 +121,7 @@ void update_rgb_buffer(int iteration, int x, int y){
 
 void write_to_file(){
     FILE * file;
-    char * filename               = "output_openmpi.ppm";
+    char * filename               = "output_pth.ppm";
     char * comment                = "# ";
 
     int max_color_component_value = 255;
@@ -141,7 +138,10 @@ void write_to_file(){
     fclose(file);
 };
 
-void compute_mandelbrot_thread(int begin, int chunk){
+void *compute_mandelbrot_thread(void *args){
+
+    struct thread_data *arg_struct = (struct thread_data*) args; 
+
     double z_x;
     double z_y;
     double z_x_squared;
@@ -155,7 +155,7 @@ void compute_mandelbrot_thread(int begin, int chunk){
     double c_x;
     double c_y;
 
-    for(i_y = begin; i_y < begin+chunk; i_y++){
+    for(i_y = arg_struct->begin; i_y < arg_struct->end; i_y++){
         c_y = c_y_min + i_y * pixel_height;
 
         if(fabs(c_y) < pixel_height / 2){
@@ -182,75 +182,58 @@ void compute_mandelbrot_thread(int begin, int chunk){
                 z_y_squared = z_y * z_y;
             };
 
-            buffer[i_y*i_x_max + i_x] = iteration;
-
+            arg_struct->f(iteration, i_x, i_y);
         };
     };
+    pthread_exit(NULL);
 };
 
 int main(int argc, char *argv[]){
-    int numtasks, taskid;
-    MPI_Init(&argc, &argv);
     init(argc, argv);
-    MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
-    MPI_Comm_rank(MPI_COMM_WORLD,&taskid);
-    printf ("MPI task %d has started...  \n", taskid);
-    int chunksize = (i_y_max / numtasks);
-    int leftover = (i_y_max % numtasks);
-    int offset;
-    MPI_Status status;
-    
+
     allocate_image_buffer();
-    if(taskid == MASTER){
-        offset = chunksize + leftover;
-        for(int dest = 1; dest<numtasks; dest++){
-            MPI_Send(&offset, 1, MPI_INT, dest, 0, MPI_COMM_WORLD);
-            offset += chunksize;
+
+    ///////////////////////////////////////////
+
+    pthread_t tids[n_threads];
+    thread_data_array = malloc(n_threads * sizeof(struct thread_data));
+
+    clock_gettime(CLOCK_MONOTONIC, &timer.t_start);
+    for (int i = 0; i < n_threads; i++) {
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+
+        if (i == 0) {
+            thread_data_array[i].begin = 0;
+        } else {
+            thread_data_array[i].begin = thread_data_array[i-1].end;
         }
 
-        /* Master does its part of the work */
-        offset = 0;
-        compute_mandelbrot_thread(offset, chunksize+leftover);
-
-        /* Wait to receive results from each task */
-        
-        offset = (chunksize + leftover)*i_y_max;
-        for (int i=1; i<numtasks; i++) {
-            int source = i;
-            MPI_Recv(&buffer[offset], chunksize*i_y_max, MPI_CHAR, source, 1,
-                     MPI_COMM_WORLD, &status);
-
-            //printf("SOURCE: %d  TAG: %d ERROR: %d\n",  status.MPI_SOURCE, status.MPI_TAG, status.MPI_ERROR);
-            offset += chunksize*i_y_max;
-
+        int gap = i_y_max / n_threads; 
+        if (i == n_threads - 1) {
+            thread_data_array[i].end = i_y_max;
+        } else {
+            thread_data_array[i].end = thread_data_array[i].begin + gap;
         }
 
-        for(int i_x = 0; i_x < i_x_max; i_x++){
-            for(int i_y = 0; i_y < i_y_max; i_y++){
-                update_rgb_buffer(buffer[i_y*i_x_max + i_x], i_x,i_y);
-            }
-        }
+        thread_data_array[i].f = update_rgb_buffer;
 
-        write_to_file();
+        pthread_create(&tids[i], &attr, 
+                           compute_mandelbrot_thread, &thread_data_array[i]);
     }
-    else{
-        int source = MASTER;
-        MPI_Recv(&offset, 1, MPI_INT, source, 0, MPI_COMM_WORLD, &status);
-        /*trabaio*/
-        compute_mandelbrot_thread(offset, chunksize);
-        
-        int comec = (i_x_max+leftover)*chunksize + (taskid-1)*(i_x_max*chunksize);
-        int fim = comec + i_y_max * chunksize;
-        MPI_Send(&buffer[offset*i_y_max], i_y_max*chunksize, MPI_CHAR, MASTER, 1, MPI_COMM_WORLD);
 
-
+    for (int i = 0; i < n_threads; i++) {
+        pthread_join(tids[i], NULL);
     }
-    MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Finalize();
-    
+
+    clock_gettime(CLOCK_MONOTONIC, &timer.t_end);
+
+    printf("%f\n",
+               (double) (timer.t_end.tv_sec - timer.t_start.tv_sec) +
+               (double) (timer.t_end.tv_nsec - timer.t_start.tv_nsec) / 1000000000.0);
     /////////////////////////////////////////
 
-    
+    write_to_file();
 
     return 0;
 };

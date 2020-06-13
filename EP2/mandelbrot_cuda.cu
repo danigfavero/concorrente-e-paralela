@@ -18,7 +18,9 @@ struct data{
     int i_x_max;
     int i_y_max;
 
-    int n_threads;
+    int n_blocks;
+    int dim_x;
+    int dim_y;
 };
 
 struct data * global_data;
@@ -75,13 +77,13 @@ void init(int argc, char *argv[]){
 
     global_data = (struct data * )malloc(sizeof(struct data));
 
-    if(argc < 7){
-        printf("usage: ./mandelbrot_cuda c_x_min c_x_max c_y_min c_y_max image_size n_threads(total)\n");
+    if(argc < 9){
+        printf("usage: ./mandelbrot_cuda c_x_min c_x_max c_y_min c_y_max image_size blocks dim_x dim_y\n");
         printf("examples with image_size = 11500:\n");
-        printf("    Full Picture:         ./mandelbrot_cuda -2.5 1.5 -2.0 2.0 11500 1024\n");
-        printf("    Seahorse Valley:      ./mandelbrot_cuda -0.8 -0.7 0.05 0.15 11500 1024\n");
-        printf("    Elephant Valley:      ./mandelbrot_cuda 0.175 0.375 -0.1 0.1 11500 1024\n");
-        printf("    Triple Spiral Valley: ./mandelbrot_cuda -0.188 -0.012 0.554 0.754 11500 1024\n");
+        printf("    Full Picture:         ./mandelbrot_cuda -2.5 1.5 -2.0 2.0 11500 4 32 32\n");
+        printf("    Seahorse Valley:      ./mandelbrot_cuda -0.8 -0.7 0.05 0.15 11500 4 32 32\n");
+        printf("    Elephant Valley:      ./mandelbrot_cuda 0.175 0.375 -0.1 0.1 11500 4 32 32\n");
+        printf("    Triple Spiral Valley: ./mandelbrot_cuda -0.188 -0.012 0.554 0.754 11500 4 32 32\n");
         exit(0);
     }
     else{
@@ -90,7 +92,9 @@ void init(int argc, char *argv[]){
         sscanf(argv[3], "%lf", &global_data->c_y_min);
         sscanf(argv[4], "%lf", &global_data->c_y_max);
         sscanf(argv[5], "%d", &image_size);
-        sscanf(argv[6], "%d", &global_data->n_threads);
+        sscanf(argv[6], "%d", &global_data->n_blocks);
+        sscanf(argv[7], "%d", &global_data->dim_x);
+        sscanf(argv[8], "%d", &global_data->dim_y);
 
         global_data->i_x_max           = image_size;
         global_data->i_y_max           = image_size;
@@ -221,6 +225,8 @@ int main(int argc, char *argv[]){
     int n_threads = global_data->n_threads;
     int n_threads_block = min(n_threads,1024);
     int N_BLOCKS = (n_threads+n_threads_block-1) / n_threads_block;
+
+    clock_gettime(CLOCK_MONOTONIC, &timer.t_start);
     compute_mandelbrot_thread<<<N_BLOCKS, n_threads_block>>>(gpu_data, d_out);
     cudaDeviceSynchronize();
     
@@ -236,6 +242,11 @@ int main(int argc, char *argv[]){
         update_rgb_buffer(iteration, linha, coluna);
     }
 
+    clock_gettime(CLOCK_MONOTONIC, &timer.t_end);
+    printf("%f\n",
+               (double) (timer.t_end.tv_sec - timer.t_start.tv_sec) +
+               (double) (timer.t_end.tv_nsec - timer.t_start.tv_nsec) / 1000000000.0);
+    
     write_to_file();
 
     return 0;
