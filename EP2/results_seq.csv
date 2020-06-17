@@ -1,0 +1,9 @@
+size,file,threads,blocks,duration
+1500,Sequential/mandelbrot_seq,1,1,0.315108
+2500,Sequential/mandelbrot_seq,1,1,0.315108
+3500,Sequential/mandelbrot_seq,1,1,0.315108
+4500,Sequential/mandelbrot_seq,1,1,0.315108
+5500,Sequential/mandelbrot_seq,1,1,0.315108
+6500,Sequential/mandelbrot_seq,1,1,0.315108
+7500,Sequential/mandelbrot_seq,1,1,0.315108
+8500,Sequential/mandelbrot_seq,1,1,0.315108
