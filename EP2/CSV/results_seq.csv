@@ -1,0 +1,16 @@
+size,file,threads,duration
+4096,Sequential/mandelbrot_seq,1,18.837413
+4096,Sequential/mandelbrot_seq,1,18.806095
+4096,Sequential/mandelbrot_seq,1,18.807136
+4096,Sequential/mandelbrot_seq,1,18.819774
+4096,Sequential/mandelbrot_seq,1,18.858108
+4096,Sequential/mandelbrot_seq,1,18.803003
+4096,Sequential/mandelbrot_seq,1,18.805183
+4096,Sequential/mandelbrot_seq,1,18.862559
+4096,Sequential/mandelbrot_seq,1,18.855538
+4096,Sequential/mandelbrot_seq,1,18.866696
+4096,Sequential/mandelbrot_seq,1,18.824662
+4096,Sequential/mandelbrot_seq,1,19.076202
+4096,Sequential/mandelbrot_seq,1,18.986612
+4096,Sequential/mandelbrot_seq,1,18.8311
+4096,Sequential/mandelbrot_seq,1,18.817943
