@@ -1,0 +1,5 @@
+threads,mean_duration,ci_duration
+1,18.036878,NaN
+2,9.20429,NaN
+4,4.632614,NaN
+8,3.170839,NaN

@@ -1,0 +1,5 @@
+size,file,threads,duration
+4096,OMP/mandelbrot_omp,1,18.036878
+4096,OMP/mandelbrot_omp,2,9.20429
+4096,OMP/mandelbrot_omp,4,4.632614
+4096,OMP/mandelbrot_omp,8,3.170839

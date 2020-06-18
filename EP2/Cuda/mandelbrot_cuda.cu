@@ -245,6 +245,8 @@ int main(int argc, char *argv[]){
                (double) (timer.t_end.tv_nsec - timer.t_start.tv_nsec) / 1000000000.0);
     
     write_to_file();
+    cudaFree(d_out);
+    cudaFree(gpu_data);
 
     return 0;
 };

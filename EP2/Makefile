@@ -20,6 +20,6 @@ mandelbrot_openmpi+omp: mandelbrot_openmpi+omp.c
 	mpicc -fopenmp -o MPI+OMP/mandelbrot_openmpi+omp MPI+OMP/mandelbrot_openmpi+omp.c
 
 mandelbrot_openmpi+cuda: mandelbrot_openmpi+cuda.cu
-	nvcc -o mandelbrot_openmpi+cuda -Xcompiler -lmpi -lstdc++ -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi/opal/mca/event/libevent2022/libevent -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi/opal/mca/event/libevent2022/libevent/include -I/usr/lib/x86_64-linux-gnu/openmpi/include -L/usr//lib -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lmpi MPI+Cuda/mandelbrot_openmpi+cuda.cu
+	nvcc -o MPI+Cuda/mandelbrot_openmpi+cuda -Xcompiler -lmpi -lstdc++ -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi/opal/mca/event/libevent2022/libevent -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi/opal/mca/event/libevent2022/libevent/include -I/usr/lib/x86_64-linux-gnu/openmpi/include -L/usr//lib -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lmpi MPI+Cuda/mandelbrot_openmpi+cuda.cu
 clean:
 	rm -rf *.o *~ all
