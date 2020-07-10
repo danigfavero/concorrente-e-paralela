@@ -13077,7 +13077,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="EP2---C&#225;lculo-do-Conjunto-de-Mandelbrot-em-Paralelo-com-CUDA-e-OpenMPI">EP2 - C&#225;lculo do Conjunto de Mandelbrot em Paralelo com CUDA e OpenMPI<a class="anchor-link" href="#EP2---C&#225;lculo-do-Conjunto-de-Mandelbrot-em-Paralelo-com-CUDA-e-OpenMPI">&#182;</a></h1><p>30 de Junho de 2020</p>
+<h1 id="EP2---C&#225;lculo-do-Conjunto-de-Mandelbrot-em-Paralelo-com-CUDA-e-OpenMPI">EP2 - C&#225;lculo do Conjunto de Mandelbrot em Paralelo com CUDA e OpenMPI<a class="anchor-link" href="#EP2---C&#225;lculo-do-Conjunto-de-Mandelbrot-em-Paralelo-com-CUDA-e-OpenMPI">&#182;</a></h1><p>10 de julho de 2020</p>
 <h2 id="Membros-do-grupo">Membros do grupo<a class="anchor-link" href="#Membros-do-grupo">&#182;</a></h2><table>
 <thead><tr>
 <th>Nome</th>
@@ -13110,7 +13110,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-julia"><pre><span></span><span class="p">]</span> <span class="n">up</span>
@@ -13129,52 +13129,13 @@ div#notebook {
     <div class="prompt"></div>
 
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre><span class="ansi-green-intense-fg ansi-bold">   Updating</span> registry at `~/.julia/registries/General`
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
 <div class="output_subarea output_stream output_stdout output_text">
-<pre></pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre><span class="ansi-green-intense-fg ansi-bold">   Updating</span> git-repo `https://github.com/JuliaRegistries/General.git`
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre></pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre><span class="ansi-green-intense-fg ansi-bold">   Updating</span> `~/Documentos/USP/concorrente-e-paralela/EP2/Project.toml`
+<pre><span class="ansi-green-intense-fg ansi-bold">  Updating</span> registry at `~/.julia/registries/General`
+<span class="ansi-green-intense-fg ansi-bold">  Updating</span> git-repo `https://github.com/JuliaRegistries/General.git`
+<span class="ansi-green-intense-fg ansi-bold"> Resolving</span> package versions...
+<span class="ansi-green-intense-fg ansi-bold">  Updating</span> `~/Documents/concorrente-e-paralela/EP2/Project.toml`
 <span class="ansi-black-intense-fg"> [no changes]</span>
-<span class="ansi-green-intense-fg ansi-bold">   Updating</span> `~/Documentos/USP/concorrente-e-paralela/EP2/Manifest.toml`
+<span class="ansi-green-intense-fg ansi-bold">  Updating</span> `~/Documents/concorrente-e-paralela/EP2/Manifest.toml`
 <span class="ansi-black-intense-fg"> [no changes]</span>
 </pre>
 </div>
@@ -13194,7 +13155,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-julia"><pre><span></span><span class="p">]</span> <span class="n">st</span>
@@ -13214,9 +13175,9 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre><span class="ansi-green-intense-fg ansi-bold">Status</span> `~/Documentos/USP/concorrente-e-paralela/EP2/Project.toml`
- <span class="ansi-black-intense-fg"> [336ed68f]</span><span class="ansi-white-fg"> CSV v0.6.2</span>
- <span class="ansi-black-intense-fg"> [a93c6f00]</span><span class="ansi-white-fg"> DataFrames v0.21.2</span>
+<pre><span class="ansi-green-intense-fg ansi-bold">    Status</span> `~/Documents/concorrente-e-paralela/EP2/Project.toml`
+ <span class="ansi-black-intense-fg"> [336ed68f]</span><span class="ansi-white-fg"> CSV v0.7.3</span>
+ <span class="ansi-black-intense-fg"> [a93c6f00]</span><span class="ansi-white-fg"> DataFrames v0.21.4</span>
  <span class="ansi-black-intense-fg"> [31c24e10]</span><span class="ansi-white-fg"> Distributions v0.23.4</span>
  <span class="ansi-black-intense-fg"> [7073ff75]</span><span class="ansi-white-fg"> IJulia v1.21.2</span>
  <span class="ansi-black-intense-fg"> [8314cec4]</span><span class="ansi-white-fg"> PGFPlotsX v1.2.8</span>
@@ -13300,6 +13261,15 @@ div#notebook {
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Além de imprimir o tempo levado, o programa utiliza 4 blocos de dimensão 256 para gerar a seguinte imagem (no formato ppm, mas tomamos liberdade para convertê-la para png e exibir aqui):</p>
+<p><img src="Output/cuda.png" alt="mandelbrot_cuda" width="400"/></p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[5]:</div>
@@ -13330,6 +13300,15 @@ div#notebook {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Imagem gerada, novamente a Triple Spiral Valley, dessa vez usando 4 processos com auxílio de OpenMPI:</p>
+<p><img src="Output/mpi.png" alt="mandelbrot_pth" width="400"/></p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
@@ -13418,13 +13397,6 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="TODO:-Explicar-melhor">TODO: Explicar melhor<a class="anchor-link" href="#TODO:-Explicar-melhor">&#182;</a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
 <p>A função <code>run_experiments</code> recebe os mesmos parâmetros <code>size</code>, <code>file</code>, e <code>threads</code>, e um parâmetro adicional <code>repetitions</code>, com o número de repetições de cada experimento com um dado número de <code>threads</code>. A função devolve um <code>DataFrame</code> com todos os experimentos.</p>
 
 </div>
@@ -13433,7 +13405,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Função adaptada para cuda</p>
+<p>Função adaptada para cuda:</p>
 
 </div>
 </div>
@@ -13486,6 +13458,14 @@ div#notebook {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Função adaptada para OpenMPI:</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -13741,6 +13721,14 @@ div#notebook {
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Função adaptada para OpenMPI:</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[13]:</div>
@@ -13782,6 +13770,14 @@ div#notebook {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Função adaptada para Cuda:</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -14023,19 +14019,6 @@ div#notebook {
 
 </div>
 
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-julia"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">read_csv_results</span><span class="p">()</span>
-</pre></div>
-
-    </div>
 </div>
 </div>
 
@@ -15103,6 +15086,14 @@ M1629.67 251.724 L2280.76 251.724 L2280.76 130.764 L1629.67 130.764  Z
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Veja no gráfico:</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[25]:</div>
@@ -15542,6 +15533,14 @@ M1629.67 251.724 L2280.76 251.724 L2280.76 130.764 L1629.67 130.764  Z
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>E o gráfico fica assim:</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -18891,6 +18890,8 @@ Ocorre uma diminuição do tempo de execução até 6 processos. Como os experim
 Quanto número de blocos, é claro a diminuição significativa do tempo conforme o aumento do número de blocos, atingindo um ponto ótimo em 64 blocos. Já no número de threads, não percebemos uma melhora significativa no tempo de execução. Por outro lado, conforme o número de threads aumenta, o intervalo de confiança diminui. 2048 Threads é o parâmetro ótimo encontrado.</p>
 <p><strong>OpenMPI + OMP</strong>
 Notamos uma diminuição do tempo significativa de 1 processo para 2. A partir de 2 processos, percebemos um aumento do intervalo de confiança, o que mostra valores mais distribuidos e piores que para 2 processos. Tal fênomeno pode ser explicado devido ao fato dos experimentos terem sido realizados localmente e ocorrer uma disputa de threads entre as duas bibliotecas.</p>
+<p><strong>Cuda + OpenMPI</strong>
+Infelizmente tivemos vários problemas rodando os experimentos utilizando Cuda e OpenMPI. Além de resultados esparços, não houve melhora na eficiência do programa. Acreditamos que o problema se dá pelo fato de estarmos rodando o OpenMPI em apenas uma máquina.</p>
 <h3 id="Compara&#231;&#227;o-entre-as-implementa&#231;&#245;es">Compara&#231;&#227;o entre as implementa&#231;&#245;es<a class="anchor-link" href="#Compara&#231;&#227;o-entre-as-implementa&#231;&#245;es">&#182;</a></h3><p>Entre OpenMP e Pthreads, o desempenho é muito próximo sendo o OpenMP sutilmente melhor, com menor intervalo de confiança e tempos melhores em seus parâmetros escolhidos. Isso ocorre pois ambos utilizam o mesmo paradigma de computação paralela. 
 Já entre Cuda e OpenMPI, o cuda é claramente melhor, mesmo em parâmetros não-ótimos. Como explicado anteriormente, isso ocorre pois os experimentos foram realizados localmente. 
 O Cuda supera também o OpenMP e Pthreads. Possivelmente por utilizar outro paradigma de computação paralela assim como depender de outro hardware.
@@ -18899,6 +18900,19 @@ O OpenMPI apresenta tempo de execução pior que o sequencial para 1 processo, s
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
 </div>
     </div>
   </div>
